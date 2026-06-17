@@ -1,0 +1,62 @@
+import express from "express";
+import passport from "passport";
+import bcrypt from "bcrypt";
+import db from "../config/pg.js";
+
+const router = express.Router();
+const saltRounds = 10;
+
+router.get("/login", (req, res) => {
+    res.render("login.ejs");
+});
+
+router.get("/register", (req, res) => {
+    res.render("register.ejs");
+});
+router.get("/logout", (req, res,next) => {
+    req.logout(function (err) {
+        if (err) {
+            return next(err);
+        }
+        res.redirect("/");
+    });
+})
+router.post("/login",
+    passport.authenticate("local", {
+        successRedirect: "/secrets",
+        failureRedirect: "/login",
+    }),
+)
+router.post("/register", async (req, res) => {
+    const email = req.body.username;
+    const password = req.body.password;
+
+    try {
+        const checkResult = await db.query("SELECT * FROM users WHERE email = $1", [
+            email,
+        ]);
+
+        if (checkResult.rows.length > 0) {
+            res.redirect("/login");
+        } else {
+            bcrypt.hash(password, saltRounds, async (err, hash) => {
+                if (err) {
+                    console.error("Error hashing password:", err);
+                } else {
+                    const result = await db.query(
+                        "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
+                        [email, hash],
+                    );
+                    const user = result.rows[0];
+                    req.login(user, (err) => {
+                        console.log("success");
+                        res.redirect("/secrets");
+                    });
+                }
+            });
+        }
+    } catch (err) {
+        console.log(err);
+    }
+})
+export default router;
