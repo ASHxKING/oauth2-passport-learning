@@ -6,7 +6,7 @@ import env from "dotenv";
 env.config();
 
 import db from "./pg.js"
-
+console.log("Google Callback URL:", process.env.GOOGLE_CALLBACK_URL);
 passport.use(
   "local",
   new Strategy(async function verify(username, password, cb) {
