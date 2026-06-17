@@ -10,9 +10,8 @@ const showSecretsPage = async (req,res)=>{
       "SELECT secret FROM users WHERE email=$1",
       [req.user.email]
    );
-
    res.render("secrets.ejs",{
-      secret: result.rows[0].secret
+      secret: result.rows[0].secret || "Share your Secret"
    });
 }
 
