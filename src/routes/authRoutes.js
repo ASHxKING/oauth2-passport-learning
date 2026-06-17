@@ -10,6 +10,20 @@ import {
 
 const router = express.Router();
 
+router.get(
+  "/auth/google",
+  passport.authenticate("google", {
+    scope: ["profile", "email"],
+  }),
+);
+
+router.get(
+  "/auth/google/secrets",
+  passport.authenticate("google", {
+    successRedirect: "/secrets",
+    failureRedirect: "/login",
+  }),
+);
 
 router.get("/login",showLoginPage);
 

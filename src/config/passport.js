@@ -1,4 +1,5 @@
 import passport from "passport";
+import bcrypt from "bcrypt";
 import { Strategy } from "passport-local";
 import GoogleStrategy from "passport-google-oauth2";
 import env from "dotenv";
